@@ -1020,19 +1020,11 @@ namespace {
       return total.getSize(TC, DC);
     }
 
-    void checkExhaustiveness(bool limitedChecking) {
+    void checkExhaustiveness() {
       // If the type of the scrutinee is uninhabited, we're already dead.
       // Allow any well-typed patterns through.
       auto subjectType = Switch->getSubjectExpr()->getType();
       if (subjectType && subjectType->isStructurallyUninhabited()) {
-        return;
-      }
-
-      // If the switch body fails to typecheck, end analysis here.
-      if (limitedChecking) {
-        // Reject switch statements with empty blocks.
-        if (Switch->getCases().empty())
-          diagnoseMissingCases(RequiresDefault::EmptySwitchBody, Space());
         return;
       }
 
@@ -1136,7 +1128,7 @@ namespace {
 
       diagnoseMissingCases(RequiresDefault::No, uncovered, unknownCase);
     }
-    
+
     enum class RequiresDefault {
       No,
       EmptySwitchBody,
@@ -1603,9 +1595,8 @@ namespace {
 } // end anonymous namespace
 
 void TypeChecker::checkSwitchExhaustiveness(const SwitchStmt *stmt,
-                                            const DeclContext *DC,
-                                            bool limited) {
-  SpaceEngine(*this, stmt, DC).checkExhaustiveness(limited);
+                                            const DeclContext *DC) {
+  SpaceEngine(*this, stmt, DC).checkExhaustiveness();
 }
 
 void SpaceEngine::Space::dump() const {

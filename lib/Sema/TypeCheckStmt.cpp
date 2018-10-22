@@ -1063,8 +1063,8 @@ public:
       previousBlock = caseBlock;
     }
 
-    if (!S->isImplicit()) {
-      TC.checkSwitchExhaustiveness(S, DC, limitExhaustivityChecks);
+    if (!S->isImplicit() && !limitExhaustivityChecks) {
+      TC.checkSwitchExhaustiveness(S, DC);
     }
 
     return S;
